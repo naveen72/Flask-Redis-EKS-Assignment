@@ -109,12 +109,12 @@ Resources:
       FromPort: 0
       ToPort: 65535
       GroupId: !Ref JumpServerSecurityGroup
-  JumpServerSecurityGroupIngress2:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      Description: Ingress on EC2 on port 22
-      CidrIp: 0.0.0.0/0
-      IpProtocol: tcp
-      FromPort: 22  
-      ToPort: 22
-      GroupId: !Ref JumpServerSecurityGroup
+#  JumpServerSecurityGroupIngress2:
+#    Type: AWS::EC2::SecurityGroupIngress
+#    Properties:
+#      Description: Ingress on EC2 on port 22
+#      CidrIp: 0.0.0.0/0
+#      IpProtocol: tcp
+#      FromPort: 22  
+#      ToPort: 22
+#      GroupId: !Ref JumpServerSecurityGroup
