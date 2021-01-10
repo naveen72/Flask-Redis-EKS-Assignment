@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS Cloud Formation Stack to create EKS Linked Service Role
+Parameters:
+  EKSServiceRoleName:
+    Description: EKS Service Role Name
+    Type: String
+    Default: EKS-Service-Role
+    ConstraintDescription: Must be valid EKS Service Role Name
+  ApplicationName:
+    Description: Application Name
+    Type: String
+Resources:
+  EKSServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:   
+            Service: 
+            - ec2.amazonaws.com  
+            - servicecatalog.amazonaws.com
+            - eks.amazonaws.com
+            - cloudformation.amazonaws.com
+          Action: 
+          - 'sts:AssumeRole'  
+      Path: "/"
+      RoleName: !Ref EKSServiceRoleName         
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+      - arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+      - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+      - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+      Policies:
+      - PolicyName: EKS-FULL-ACCESS
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+           - Sid: EKSAdminAccess
+             Effect: Allow
+             Action:
+             - eks:*  
+             Resource: "*"
+           - Sid: IAMAccess
+             Effect: Allow
+             Action:
+             - iam:PassRole
+             Resource:
+             - Fn::Join:
+               - ''
+               - - 'arn:aws:iam::'
+                 - !Sub '${AWS::AccountId}:role/'
+                 - !Ref EKSServiceRoleName
+           - Sid: EC2deny
+             Effect: Deny
+             Action: 
+             - ec2:CreateRoute
+             - ec2:DeleteRoute
+             Resource: "*"
+      Tags:
+      - Key: Name
+        Value: !Ref EKSServiceRoleName
+      - Key: Application Name
+        Value: !Ref ApplicationName
+  EKSServiceRoleInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+      - Ref: EKSServiceRole
