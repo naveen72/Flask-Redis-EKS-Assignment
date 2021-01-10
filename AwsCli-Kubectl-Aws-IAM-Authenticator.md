@@ -106,5 +106,12 @@ Watch the status of your nodes and wait for them to reach the Ready status.
 kubectl get nodes
 kubectl get nodes --watch
 ```
-
+Example:
+```
+root@ip-172-31-88-33:~# kubectl get nodes
+NAME                            STATUS     ROLES    AGE   VERSION
+ip-172-31-29-79.ec2.internal    NotReady   <none>   7s    v1.10.3
+ip-172-31-47-106.ec2.internal   NotReady   <none>   7s    v1.10.3
+ip-172-31-84-159.ec2.internal   NotReady   <none>   11s   v1.10.3
+```
 For more details, please refer https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html
