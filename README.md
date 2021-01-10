@@ -24,7 +24,7 @@ Step3: Create EKS Cluster
 
 Run cloudformation template EKS-Cluster.yml, it will create EKS Cluster and version will be 1.16. We can select the EKS version during cloudformation launch time.
 ```
-Note: Assume Service Role created in Step1, which launching this EKS cluster stack using template EKS-Cluster.yml"
+Note: Assume Service Role created in Step1, while launching this EKS cluster stack using template EKS-Cluster.yml"
 ```
 Step4: Provison Worker Nodes
 ============================
@@ -32,3 +32,63 @@ Run cloudformaton template amazon-eks-nodegroup.yaml to provison the worker node
 ```
 amazon-eks-nodegroup.yaml
 ```
+step5: Create ECR Repository
+============================
+
+Create ECR Repository to store Flask app and redis storage image using cloudformation template ECR.yml. This template will create separate registry for Flask app and redis storage
+```
+ECR.yml
+```
+step6: Create Jump Server 
+==========================
+
+Create a jump server to manage all EKS cluster related activity using kubectl command.
+```
+Jump_Server.yml
+```
+Note: Make sure to provide only Instance profile name of service role (created in step1), whole ARN is not required.
+
+step7: awscli, kubectl & aws-iam-authenticator Installation 
+==========================================================
+
+Refer file AwsCli-Kubectl-Aws-IAM-Authenticator.md to do this configuration.
+```
+AwsCli-Kubectl-Aws-IAM-Authenticator.md
+```
+Also, install docker on jump server. Steps provided below:
+
+update your existing list of packages:
+```
+sudo apt update
+```
+install a few prerequisite packages which let apt use packages over HTTPS:
+```
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+```
+Then add the GPG key for the official Docker repository to your system:
+```
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+```
+Next, update the package database with the Docker packages from the newly added repo:
+```
+sudo apt update
+```
+Install Docker
+```
+sudo apt install docker-ce
+```
+Docker should now be installed, the daemon started, and the process enabled to start on boot. Check that it’s running:
+```
+sudo systemctl status docker
+```
+Executing the Docker Command Without Sudo: To avoid typing sudo whenever we run the docker command, add username to the docker group:
+```
+sudo usermod -aG docker ${USER}
+```
+To apply the new group membership, log out of the server and back in, or type the following:
+```
+su - ${USER}
+```
+
+
+
