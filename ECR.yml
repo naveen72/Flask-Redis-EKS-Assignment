@@ -1,0 +1,53 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Amazon ecr'
+Parameters:
+  ECRRepository1Name:
+    Description: NAME of ECR Repository for app
+    Type: String
+    Default: 'flaskapp'
+  ECRRepository2Name:
+    Description: NAME of ECR Repository for storage
+    Type: String
+    Default: 'redis'
+Resources:
+  Repository1: 
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: !Ref ECRRepository1Name
+      RepositoryPolicyText: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Sid: AllowPushPull
+            Effect: Allow
+            Principal: 
+              AWS: "*"
+            Action: 
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "ecr:BatchCheckLayerAvailability"
+              - "ecr:PutImage"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:UploadLayerPart"
+              - "ecr:CompleteLayerUpload"
+  Repository2: 
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: !Ref ECRRepository2Name
+      RepositoryPolicyText: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Sid: AllowPushPull
+            Effect: Allow
+            Principal: 
+              AWS: "*"
+            Action: 
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "ecr:BatchCheckLayerAvailability"
+              - "ecr:PutImage"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:UploadLayerPart"
+              - "ecr:CompleteLayerUpload"
