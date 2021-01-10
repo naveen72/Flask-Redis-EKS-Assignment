@@ -1,0 +1,32 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: flask_webapp
+  namespace: default
+  labels:
+    run: flask_webapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: flask_webapp
+  template:
+    metadata:
+      labels:
+        run: flask_webapp
+    spec:
+      containers:
+      - image: 045959739851.dkr.ecr.us-east-1.amazonaws.com/flaskapp:latest
+        name: flask_webapp
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 300
+          timeoutSeconds: 5
+          periodSeconds: 300
+          failureThreshold: 3
+        ports:
+          - containerPort: 5000
+            name: http
+            protocol: TCP
