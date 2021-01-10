@@ -83,3 +83,123 @@ docker tag redis:alpine 045959739851.dkr.ecr.us-east-1.amazonaws.com/redis:lates
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 045959739851.dkr.ecr.us-east-1.amazonaws.com
 docker push 045959739851.dkr.ecr.us-east-1.amazonaws.com/redis:latest
 ```
+Step9: FlaskApp Deployment
+============================
+
+Refer flask-deployment.yml for flask_webapp deployment. We have used default namespace.
+```
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: flask_webapp
+  namespace: default
+  labels:
+    run: flask_webapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: flask_webapp
+  template:
+    metadata:
+      labels:
+        run: flask_webapp
+    spec:
+      containers:
+      - image: 045959739851.dkr.ecr.us-east-1.amazonaws.com/flaskapp:latest
+        name: flask_webapp
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 300
+          timeoutSeconds: 5
+          periodSeconds: 300
+          failureThreshold: 3
+        ports:
+          - containerPort: 5000
+            name: http
+            protocol: TCP
+```
+Note:
+```
+Here, in above code snippet,my ECR link is there. Update it before running. Also, as per requirement, we have no of replica as 2 for webapp
+```
+Step9: Redis Storage Deployment
+============================
+Refer redis-deployment.yml for Redis storage deployment.
+
+```
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: redis
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      run: flask_webapp
+      role: master
+      tier: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: flask_webapp
+        role: master
+        tier: backend
+    spec:
+      containers:
+      - name: redis
+        image: 045959739851.dkr.ecr.us-east-1.amazonaws.com/redis:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 6379
+```
+Note:
+```
+Here, in above code snippet,my ECR link is there. Update it before running. Also, as per requirement, we have no of replica as 1 for Redis storage
+```
+Step10: Redis Storage Service
+============================
+Refer redis-deployment.yml for Redis storage deployment.
+Reason for setting up service: Setted up redis instance, however it was not able to talk to each-other from separate , the setup worked over local machine with docker-compose but did not work with kubernetes. flask couldn't find the service, so the error was with  configuration files
+
+Flask code:
+```
+redis = Redis(host='redis', port=6379)
+```
+So to fix this, we update flask_app.py with below lines:
+```
+redis = Redis(host='my-redis-svc.default.svc.cluster.local', port=6379)
+```
+And created below service object. Now pods should be accessible by other pods in same namespace using that hostname
+```
+my-redis-svc.default.svc.cluster.local
+```
+Redis-service.yml snippet:
+```
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: redis
+  name: my-redis-svc
+  namespace: default
+spec:
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: 6379
+    protocol: TCP
+  selector:
+    app: redis
+  type: ClusterIP
+```
+
+As per the requirement, we have two pods for flask webapp and one for redis storage. This should work seemlessly. Webapp can be access using Pod_ip and port.
+
+Thanks for your time.
