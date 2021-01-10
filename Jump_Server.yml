@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS Cloud Formation Stack to create Jump Serverand it's security Group
+Parameters:
+  VPC:
+    Description: Name of the VPC where resources will  be created
+    Type: AWS::EC2::VPC::Id
+  JumpServerSubnet:
+    Description: Subnet ID of Jump Server
+    Type: AWS::EC2::Subnet::Id 
+  JumpServerENIName:
+    Type: String
+    Description: Name of Jump Srever ENI
+    Type: String
+    Default: 'JumpServer-ENI'
+  JumpServerName:
+    Type: String
+    Description: Name of EKS Jump Server Name 
+    Type: String
+    Default: 'EKS-Jump-Server'
+  JumpserverSecurityGroupName:
+    Type: String
+    Description: Name of Jump server Security Group
+    Type: String
+    Default: 'Jump-Server-SecurityGroup'
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Public key Name
+  JumpServerAMI:
+    Type: String
+    Description: AMI ID
+    Default: 'ami-0817d428a6fb68645'
+  Instancetype:
+    Type: String
+    Description: Instance type of Jump Server
+    Default: 't2.micro'
+  ServiceRoleInstanceProfile:
+    Type: String
+    Description: Instance type of Jump Server (Instance profile of EKS Service Role)
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: ENI deatils for app server
+      Parameters:
+      - VPC
+      - JumpServerSubnet
+      - JumpServerENIName
+      - JumpServerName
+      - JumpserverSecurityGroupName
+      - KeyName
+      - JumpServerAMI
+      - Instancetype
+      - ServiceRoleInstanceProfile
+Resources:
+  JumpServerENI:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: Jump Server ENI
+      SubnetId: !Ref JumpServerSubnet
+      GroupSet: [!Ref JumpServerSecurityGroup]
+      Tags:
+        - Key: Name
+          Value: JumpServerENIName
+        - Key: Service
+          Value: ENI
+  JumpServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref JumpServerAMI
+      InstanceType: !Ref Instancetype
+      KeyName: !Ref KeyName
+      IamInstanceProfile: !Ref ServiceRoleInstanceProfile
+      BlockDeviceMappings:
+      - DeviceName: "/dev/sda1"
+        Ebs:
+          VolumeSize: 100
+          VolumeType: gp2
+          DeleteOnTermination: true
+      NetworkInterfaces:
+         -
+           NetworkInterfaceId: !Ref JumpServerENI
+           DeviceIndex: '0'
+      Tags:
+      - Key: Name
+        Value: !Ref JumpServerName
+  JumpServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Jump Server Security Group
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Ref JumpserverSecurityGroupName
+        - Key: Service
+          Value: SecurityGroup
+  JumpServerSecurityGroupIngress1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress within Jump Server security group
+      SourceSecurityGroupId: !Ref 'JumpServerSecurityGroup'
+      IpProtocol: -1
+      GroupId: !Ref JumpServerSecurityGroup
+  JumpServerSecurityGroupIngress2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress on EC2 on port 8080
+      CidrIp: 0.0.0.0/0
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      GroupId: !Ref JumpServerSecurityGroup
+  JumpServerSecurityGroupIngress2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress on EC2 on port 22
+      CidrIp: 0.0.0.0/0
+      IpProtocol: tcp
+      FromPort: 22  
+      ToPort: 22
+      GroupId: !Ref JumpServerSecurityGroup
