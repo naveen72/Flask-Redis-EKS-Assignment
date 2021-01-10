@@ -69,4 +69,4 @@ root@ip-172-31-88-33:~# kubectl get svc
 NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
 kubernetes   ClusterIP   10.100.0.1   <none>        443/TCP   32m
 ```
-
+ 
