@@ -35,7 +35,7 @@ Parameters:
     Default: 't2.micro'
   ServiceRoleInstanceProfile:
     Type: String
-    Description: Instance type of Jump Server (Instance profile of EKS Service Role)
+    Description: "Instance type of Jump Server (Instance profile of EKS Service Role). Example: EKS-Service-Role-EKSServiceRoleInstanceProfile-1NS7THCO0HF3Y"
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
