@@ -77,3 +77,12 @@ Push image to repo
 docker push 045959739851.dkr.ecr.us-east-1.amazonaws.com/flaskapp:latest
 ```
 docker push 045959739851.dkr.ecr.us-east-1.amazonaws.com/flaskapp:latest
+```
+
+Push Redis docker image to ECR.
+```
+docker pull redis:alpine
+docker tag redis:alpine 045959739851.dkr.ecr.us-east-1.amazonaws.com/redis:latest
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 045959739851.dkr.ecr.us-east-1.amazonaws.com
+docker push 045959739851.dkr.ecr.us-east-1.amazonaws.com/redis:latest
+```
