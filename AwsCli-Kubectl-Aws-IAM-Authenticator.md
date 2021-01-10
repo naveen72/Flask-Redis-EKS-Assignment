@@ -38,3 +38,5 @@ root@ip-172-31-88-33:~# mkdir -p $HOME/bin && cp ./aws-iam-authenticator $HOME/b
 root@ip-172-31-88-33:~# echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
 root@ip-172-31-88-33:~# aws-iam-authenticator help
 ```
+
+Now, we are good with the pre-requisites.
