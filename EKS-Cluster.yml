@@ -1,0 +1,98 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS Cloud Formation Stack to create EKS Cluster
+Parameters:
+  VPC:
+    Description: Name of the VPC where resources will  be created
+    Type: "AWS::EC2::VPC::Id"
+  EKSClusterName:
+    Description: Name OF EKS Cluster
+    Type: String
+    ConstraintDescription: Must be a valid Cluster Name
+    Default: 'EKSCL-01'
+  EKSClusterVersion:
+    Description: Version of EKS Cluster
+    Type: String
+    Default: '1.16'
+    AllowedValues:
+      - 1.16
+      - 1.17
+      - 1.18
+  EKSClusterSubnetIds:
+    Description: List of subnet IDs of cluster
+    Type: List<AWS::EC2::Subnet::Id>
+  EKSServiceRoleARN:
+    Type: String
+    Description: Service Role ARN of EKS Cluster
+    ConstraintDescription: Must be valid EKS Service Role ARN
+  CommonSecurityGroup:
+    Description: Common Security Group Name
+    Type: AWS::EC2::SecurityGroup::Id
+  EKSControlPlaneAdditionalSecurityGroupName: 
+    Type: String
+    Default: "EKS-ADD-SG"
+    Description: Name of Additonal EKSControlPlaneAdditionalSecurityGroup (To allow configuration addtional traffic)
+  ApplicationName:
+    Type: String
+  Environment:
+    Type: String
+    Description: Valid Environment Name
+    AllowedValues:
+      - DEV
+      - QA
+      - UAT
+      - PROD
+      - UAT-DR
+      - DR      
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: EKS Cluster Details
+      Parameters:
+      - VPC
+      - EKSClusterName
+      - EKSClusterSubnetIds
+      - EKSClusterVersion
+      - EKSServiceRoleARN
+      - CommonSecurityGroup
+      - EKSControlPlaneAdditionalSecurityGroupName
+    - Label:
+        default: Tag Details
+      Parameters:
+      - Environment
+      - ApplicationName
+Resources:
+  EKSCluster: 
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: !Ref EKSClusterName
+      ResourcesVpcConfig:
+        SubnetIds: !Ref EKSClusterSubnetIds
+        SecurityGroupIds:
+        - !Ref CommonSecurityGroup        
+        - !Ref EKSControlPlaneAdditionalSecurityGroup
+      RoleArn: !Ref EKSServiceRoleARN
+      Version: !Ref EKSClusterVersion
+  EKSControlPlaneAdditionalSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Additonal EKSControlPlaneAdditionalSecurityGroup
+      GroupName: !Ref EKSControlPlaneAdditionalSecurityGroupName
+      VpcId: !Ref VPC
+  EKSControlPlaneAdditionalSecurityGroupIngress1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Inbound SSL traffic to EKS API from Admin Jump Server
+      CidrIp: 0.0.0.0/0
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      GroupId: !Ref EKSControlPlaneAdditionalSecurityGroup
+  EKSControlPlaneAdditionalSecurityGroupIngress2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress within EKS security group
+      GroupId: !Ref 'EKSControlPlaneAdditionalSecurityGroup'
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref 'EKSControlPlaneAdditionalSecurityGroup'
