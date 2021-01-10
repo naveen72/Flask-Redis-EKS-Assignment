@@ -55,40 +55,25 @@ Refer file AwsCli-Kubectl-Aws-IAM-Authenticator.md to do this configuration.
 ```
 AwsCli-Kubectl-Aws-IAM-Authenticator.md
 ```
-Also, install docker on jump server. Steps provided below:
+Also, install docker on jump server. 
 
-update your existing list of packages:
-```
-sudo apt update
-```
-install a few prerequisite packages which let apt use packages over HTTPS:
-```
-sudo apt install apt-transport-https ca-certificates curl software-properties-common
-```
-Then add the GPG key for the official Docker repository to your system:
-```
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-```
-Next, update the package database with the Docker packages from the newly added repo:
-```
-sudo apt update
-```
-Install Docker
-```
-sudo apt install docker-ce
-```
-Docker should now be installed, the daemon started, and the process enabled to start on boot. Check that it’s running:
-```
-sudo systemctl status docker
-```
-Executing the Docker Command Without Sudo: To avoid typing sudo whenever we run the docker command, add username to the docker group:
-```
-sudo usermod -aG docker ${USER}
-```
-To apply the new group membership, log out of the server and back in, or type the following:
-```
-su - ${USER}
-```
+Step8: Docker image Creation
+============================
 
-
-
+Run dockbuild on Dockerfile uploaded to create flask app image and perform below actvity.
+```
+docker build -t flaskapp:1 .
+```
+Tag with Repo address
+```
+docker tag flaskapp:latest 045959739851.dkr.ecr.us-east-1.amazonaws.com/flaskapp:latest
+```
+Login to ECR Repo
+```
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 045959739851.dkr.ecr.us-east-1.amazonaws.com
+```
+Push image to repo
+```
+docker push 045959739851.dkr.ecr.us-east-1.amazonaws.com/flaskapp:latest
+```
+docker push 045959739851.dkr.ecr.us-east-1.amazonaws.com/flaskapp:latest
