@@ -11,7 +11,7 @@ apt-get install awscli
 ```
 step2: Kubectl and aws-iam-authentictor installation
 ====================================================
-
+Note: This kubectl cofiguration done for EKS 1.16. Please refer https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
 Be in root user mode and run commands as shown below to install kubectl:
 ```
 root@ip-172-31-88-33:/home/ubuntu# cd
@@ -25,6 +25,7 @@ root@ip-172-31-88-33:~# echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
 root@ip-172-31-88-33:~# kubectl
 ```
 Be in root user mode and run commands as shown below to install aws-iam-authenticator:
+For detailed documentation, please refer https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html
 ```
 root@ip-172-31-88-33:~# pwd
 /root
