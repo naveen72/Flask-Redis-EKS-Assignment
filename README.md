@@ -76,9 +76,6 @@ Push image to repo
 ```
 docker push 045959739851.dkr.ecr.us-east-1.amazonaws.com/flaskapp:latest
 ```
-docker push 045959739851.dkr.ecr.us-east-1.amazonaws.com/flaskapp:latest
-```
-
 Push Redis docker image to ECR.
 ```
 docker pull redis:alpine
