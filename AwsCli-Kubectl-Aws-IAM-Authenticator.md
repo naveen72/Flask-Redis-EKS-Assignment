@@ -40,3 +40,33 @@ root@ip-172-31-88-33:~# aws-iam-authenticator help
 ```
 
 Now, we are good with the pre-requisites.
+
+Step3: Configure cluster with Jump Server
+==============================================
+To create or update the kubeconfig file for cluster, run the following command:
+
+```
+aws eks --region region update-kubeconfig --name cluster_name
+```
+Note: Replace region with your AWS Region. Replace cluster_name with your cluster name. By default, the configuration file is created at the kubeconfig path ($HOME/.kube/config) in your home directory or merged with an existing kubeconfig at that location. 
+```
+Example:
+root@ip-172-31-88-33:/home/ubuntu# cd
+root@ip-172-31-88-33:~# aws eks --region us-east-1 update-kubeconfig --name EKSCL-01
+Added new context arn:aws:eks:us-east-1:045959739851:cluster/EKSCL-01 to /root/.kube/config
+```
+To test your configuration, run the following command:
+```
+kubectl get svc
+```
+Example:
+```
+ubuntu@ip-172-31-88-33:~$ sudo su
+root@ip-172-31-88-33:/home/ubuntu# cd
+root@ip-172-31-88-33:~# aws eks --region us-east-1 update-kubeconfig --name EKSCL-01
+Added new context arn:aws:eks:us-east-1:045959739851:cluster/EKSCL-01 to /root/.kube/config
+root@ip-172-31-88-33:~# kubectl get svc
+NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+kubernetes   ClusterIP   10.100.0.1   <none>        443/TCP   32m
+```
+
