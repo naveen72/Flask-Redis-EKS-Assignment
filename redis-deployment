@@ -1,0 +1,28 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: redis
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      run: flask_webapp
+      role: master
+      tier: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: flask_webapp
+        role: master
+        tier: backend
+    spec:
+      containers:
+      - name: redis
+        image: 045959739851.dkr.ecr.us-east-1.amazonaws.com/redis:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 6379
