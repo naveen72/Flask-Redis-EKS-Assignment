@@ -11,8 +11,7 @@ Parameters:
   NodeImageId:
     Type: String
     Description: AMI id for the node instances.
-    Default: 'ami-dea4d5a1'
-
+    
   NodeInstanceType:
     Description: EC2 instance type for the node instances
     Type: String
